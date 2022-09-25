@@ -1,23 +1,23 @@
 const express = require("express");
 const multer = require("multer");
 // const upload = multer({ dest: "uploads/" });
-const path = require("path")
+const path = require("path");
+const { spawn } = require("child_process");
+
+const PORT =5000
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// var upload = multer({ dest: "Upload_folder_name" })
-// If you do not want to use diskStorage then uncomment it
-
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
     // Uploads is the Upload_folder_name
-    cb(null, "/Nft/clinical-dataMasking-backend/data/input");
+    cb(null, "data/input");
   },
   filename: function (req, file, cb) {
-    console.log(file)
-    cb(null, file.originalname  );
+    console.log(file);
+    cb(null, file.originalname);
   },
 });
 
@@ -31,11 +31,13 @@ var upload = multer({
   fileFilter: function (req, file, cb) {
     // Set the filetypes, it is optional
     // var filetypes = /jpeg|jpg|png|text|plain|pdf/;
-    var filetypes = ["text/plain",".txt"];
+    var filetypes = ["text/plain", ".txt"];
 
     var mimetype = filetypes.includes(file.mimetype);
 
-    var extname = filetypes.includes(path.extname(file.originalname).toLowerCase());
+    var extname = filetypes.includes(
+      path.extname(file.originalname).toLowerCase()
+    );
 
     if (mimetype && extname) {
       return cb(null, true);
@@ -49,8 +51,7 @@ var upload = multer({
   },
 
   // mypic is the name of file attribute
-})
-
+});
 
 app.post("/upload_files", upload.array("files"), uploadFiles);
 
@@ -59,10 +60,22 @@ app.get("/", (req, res) => {
 });
 
 function uploadFiles(req, res) {
-  console.log(req.body);
-  console.log(req.files);
-  res.json({ message: "Successfully uploaded files" });
+
+  var dataToSend;
+  // spawn new child process to call the python script
+  const python = spawn("python", ["dataMasking.py"]);
+  // collect data from script
+  python.stdout.on("data", function (data) {
+    console.log("Pipe data from python script ...");
+    dataToSend = data.toString();
+  });
+  // in close event we are sure that stream from child process is closed
+  python.on("close", (code) => {
+    console.log(`child process close all stdio with code ${code}`);
+    // send data to browser
+    res.send(dataToSend);
+  });
 }
-app.listen(5000, () => {
-  console.log(`Server started...`);
+app.listen(PORT, () => {
+  console.log(`Server started runnig on`,PORT);
 });
