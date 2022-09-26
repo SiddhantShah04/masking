@@ -3,7 +3,7 @@ FROM node:alpine
 
 #Install some dependencies
 
-RUN apt-get update || : && apt-get install python -y
+RUN apk add update || : && apk add install python -y
 
 
 WORKDIR /usr/app
