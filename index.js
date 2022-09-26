@@ -5,7 +5,7 @@ const path = require("path");
 const { spawn } = require("child_process");
 const fs = require("fs");
 
-const PORT = 5000;
+const PORT = 5002;
 
 const app = express();
 app.use(express.json());
