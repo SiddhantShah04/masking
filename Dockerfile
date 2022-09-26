@@ -1,5 +1,5 @@
 # Specify a base image
-FROM node:9-slim
+FROM node:14-slim
 
 #Install some dependencies
 
