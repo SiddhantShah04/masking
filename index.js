@@ -14,7 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 function runPythonScript() {
   var dataToSend;
   // spawn new child process to call the python script
-  const python = spawn("python", ["dataMasking.py"]);
+  const python = spawn("python3", ["dataMasking.py"]);
   // collect data from script
   return new Promise((resolve, reject) => {
     python.stdout.on("data", function (data) {
