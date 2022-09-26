@@ -1,9 +1,9 @@
 # Specify a base image
-FROM node:alpine
+FROM node:slim
 
 #Install some dependencies
 
-RUN apk add update || : && apk add install python -y
+RUN apt-get update || : && apt-get install python -y
 
 
 WORKDIR /usr/app
